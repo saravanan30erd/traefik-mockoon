@@ -11,7 +11,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # Mockoon CLI path
-MOCKOON_CLI = 
+MOCKOON_CLI = '/usr/local/bin/mockoon-cli'
 
 # Traefik URL
 TRAEFIK_URL = 'mock.example.com'

@@ -8,31 +8,26 @@ class MockoonCLI(object):
         self.t_url = config.TRAEFIK_URL
         self.m_cli = config.MOCKOON_CLI
 
-    def get_mockservices(self, cli, virtserver):
+    def get_mockservices(self):
+        self.mocks = []
+        cli = '{} list'.format(self.m_cli)
         l = subprocess.check_output(cli, shell=True, universal_newlines=True)
-        virts_list = l.split('\n')
-        virts_list = list(filter(None, virts_list))
-        for i in virts_list:
+        mocks_list = l.split('\n')
+        mocks_list = list(filter(None, mocks_list))
+        ml = mocks_list[2:]
+        for i in ml:
             ls = []
-            v = i.split('|')
-            ls.append(v[2].strip())
-            ls.append(v[3].strip())
-            ls.append(v[4].strip())
-            ls.append(virtserver)
-            if v[5].strip() == 'true':
-                self.virts.append(ls)
-
-    def parse_mockservices(self):
-        self.virts = []
-        for virtserver in self.servers:
-            virtserver_cli = '{} -ls -s {}:9090 -u {} -pw {} | tail -n+4 | head -n-1'.format(
-                self.m_cli,
-                virtserver,
-                self.user,
-                self.password
-            )
-            self.get_mockservices(virtserver_cli, virtserver)
-        return self.virts
+            v = i.split()
+            if len(v) == 9:
+                ls.append(v[0])
+                ls.append(v[8])
+                ls.append(v[6])
+                ls.append(v[7])
+                if v[2] == 'online':
+                    self.mocks.append(ls)
+            else:
+                print('Error: Nested Path not mentioned - {}'.format(v[0]))
+        return self.mocks
 
     def generate_dynamic_config(self):
         d_conf = {
@@ -41,35 +36,28 @@ class MockoonCLI(object):
                 'services': {}
             }
         }
-        virts = self.parse_mockservices()
-        for virt in virts:
-            rule = 'Host(`{}`) && PathPrefix(`{}`)'.format(
+        mocks = self.get_mockservices()
+        for mock in mocks:
+            rule = 'Host(`{}`) && PathPrefix(`/{}`)'.format(
                 self.t_url,
-                virt[1]
+                mock[1]
             )
-            router = {'rule' : rule, 'service' : virt[0]}
-            url = 'http://{}:{}'.format(virt[3], virt[2])
+            router = {'rule' : rule, 'service' : mock[0]}
+            url = 'http://{}:{}'.format(mock[2], mock[3])
             service = {'loadBalancer': {'servers': [{'url': url }]}}
-            d_conf['http']['routers'][virt[0]] = router
-            d_conf['http']['services'][virt[0]] = service
+            d_conf['http']['routers'][mock[0]] = router
+            d_conf['http']['services'][mock[0]] = service
         return d_conf
 
 def generate_json():
-    v = VirtServer()
+    v = MockoonCLI()
     conf = v.generate_dynamic_config()
-    #with open('mock-service.json', 'w') as fp:
-    #    json.dump(conf, fp)
     return json.dumps(conf)
 
 def generate_yaml():
     v = MockoonCLI()
     conf = v.generate_dynamic_config()
-    #with open('mock-service.yaml', 'w') as fp:
-    #    yaml.dump(conf, fp)
-    return yaml.dump(conf)
+    print(yaml.dump(conf))
 
 if __name__ == '__main__':
-    if output == 'json':
-        generate_json()
-    elif output == 'yaml':
-        generate_yaml()
+    generate_yaml()
