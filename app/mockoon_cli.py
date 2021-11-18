@@ -26,7 +26,7 @@ class MockoonCLI(object):
                 if v[2] == 'online':
                     self.mocks.append(ls)
             else:
-                print('Error: Nested Path not mentioned - {}'.format(v[0]))
+                config.logger.error('{} - Nested Path not mentioned'.format(v[0]))
         return self.mocks
 
     def generate_dynamic_config(self):
@@ -57,7 +57,7 @@ def generate_json():
 def generate_yaml():
     v = MockoonCLI()
     conf = v.generate_dynamic_config()
-    print(yaml.dump(conf))
+    return yaml.dump(conf)
 
 if __name__ == '__main__':
     generate_yaml()

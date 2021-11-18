@@ -17,7 +17,7 @@ def traefik_dynamic_config():
         content = generate_json()
         mimetype = 'application/json'
         header = {'Content-Disposition':'attachment;filename=services.json'}
-    elif output == 'yaml':
+    else:
         content = generate_yaml()
         mimetype = 'text/yaml'
         header = {'Content-Disposition':'attachment;filename=services.yaml'}
@@ -44,4 +44,4 @@ def interval_server_error(error):
     return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=False,port=3000)
+    app.run(host='0.0.0.0',debug=False,port=8000)
