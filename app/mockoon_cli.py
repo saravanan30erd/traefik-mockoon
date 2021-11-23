@@ -42,7 +42,8 @@ class MockoonCLI(object):
                 self.t_url,
                 mock[1]
             )
-            router = {'rule' : rule, 'service' : mock[0]}
+            router = {'rule' : rule, 'service' : mock[0],
+                'entryPoints' : 'websecure', 'tls': {}}
             url = 'http://{}:{}'.format(mock[2], mock[3])
             service = {'loadBalancer': {'servers': [{'url': url }]}}
             d_conf['http']['routers'][mock[0]] = router
