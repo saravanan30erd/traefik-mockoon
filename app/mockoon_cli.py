@@ -16,6 +16,21 @@ class MockoonCLI(object):
         ml = mocks_list[2:]
         return ml
 
+    def get_unused_port(self):
+        ml = self.get_data_from_cli()
+        used_ports = []
+        for i in ml:
+            v = i.split()
+            used_ports.append(int(v[7]))
+        port = 3000
+        max_port = 3500
+        while port <= max_port:
+            if port in used_ports:
+                port += 1
+            else:
+                return port
+        return 'No free ports'
+
     def get_mockservices(self):
         self.mocks = []
         ml = self.get_data_from_cli()
@@ -64,5 +79,10 @@ def generate_yaml():
     conf = v.generate_dynamic_config()
     return yaml.dump(conf)
 
+def get_unused_port():
+    v = MockoonCLI()
+    return v.get_unused_port()
+
 if __name__ == '__main__':
-    generate_yaml()
+    #generate_yaml()
+    get_unused_port()

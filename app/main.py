@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, Response
 import socket
 from mockoon_cli import generate_json
 from mockoon_cli import generate_yaml
+from mockoon_cli import get_unused_port
 
 app = Flask(__name__)
 
@@ -24,6 +25,11 @@ def traefik_dynamic_config():
     return Response(content,
         mimetype=mimetype,
         headers=header)
+
+@app.route('/api/getUnusedPort', methods=['GET'])
+def mockoon_cli_get_port():
+    port = get_unused_port()
+    return jsonify({'port' : port}), 200
 
 
 ## Custom HTTP status error handler ##
