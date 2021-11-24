@@ -8,13 +8,17 @@ class MockoonCLI(object):
         self.t_url = config.TRAEFIK_URL
         self.m_cli = config.MOCKOON_CLI
 
-    def get_mockservices(self):
-        self.mocks = []
+    def get_data_from_cli(self):
         cli = '{} list'.format(self.m_cli)
         l = subprocess.check_output(cli, shell=True, universal_newlines=True)
         mocks_list = l.split('\n')
         mocks_list = list(filter(None, mocks_list))
         ml = mocks_list[2:]
+        return ml
+
+    def get_mockservices(self):
+        self.mocks = []
+        ml = self.get_data_from_cli()
         for i in ml:
             ls = []
             v = i.split()
