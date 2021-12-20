@@ -1,0 +1,16 @@
+[Unit]
+Description=Traefik HTTP provider for Mockoon
+After=network.target
+
+[Service]
+User=root
+Group=root
+
+PermissionsStartOnly=true
+
+WorkingDirectory=/opt/traefik-mockoon
+ExecStart=/opt/traefik-mockoon/app/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
